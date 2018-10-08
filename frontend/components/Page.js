@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './styles/styles.scss';
 import Header from './Header';
 import Meta from './Meta';
+import Modal from './Modal';
 
 class Page extends Component {
   render() {
@@ -10,6 +11,7 @@ class Page extends Component {
         <Meta />
         <Header />
         <main>{this.props.children}</main>
+        <Modal />
       </>
     );
   }
