@@ -39,6 +39,14 @@ type Query {
   ): [Item]!
   item(where: ItemWhereUniqueInput!): Item
   itemsConnection(where: ItemWhereInput): ItemConnection!
+  posts(
+    where: PostWhereInput
+    orderBy: PostOrderByInput
+    skip: Int
+    first: Int
+  ): [Post]!
+  post(where: PostWhereUniqueInput!): Post
+  postsConnection(where: PostWhereInput): PostConnection!
   me: User
   users: [User]!
   order(id: ID!): Order
@@ -52,4 +60,5 @@ type User {
   permissions: [Permission!]!
   cart: [CartItem!]!
   orders: [OrderItem]
+  posts: [Post]
 }

@@ -1,6 +1,8 @@
+import Posts from '../components/Posts';
+
 const Home = props => (
   <div>
-    <p>Hello</p>
+    <Posts {...props} />
   </div>
 );
 

@@ -278,8 +278,7 @@ const Mutations = {
   async createOrder(parent, args, ctx, info) {
     // 1. Query the current user and make sure they are signed in
     const { userId } = ctx.request;
-    if (!userId)
-      throw new Error('You must be signed in to complete this order.');
+    if (!userId) throw new Error('You must be signed in to complete this order.');
     const user = await ctx.db.query.user(
       { where: { id: userId } },
       `{
@@ -337,17 +336,17 @@ const Mutations = {
   async createPost(parent, args, ctx, info) {
     // Query the user and make sure they are signed in
     const { userId } = ctx.request;
-    if (!userId)
-      throw new Error('You must be signed in to complete this order.');
+    if (!userId) throw new Error('You must be signed in to complete this order.');
     // Query the current user
     const currentUser = await ctx.db.query.user(
       {
         where: {
-          id: ctx.request.userId,
+          id: userId,
         },
       },
-      info
+      '{ id, permissions, email, name }'
     );
+    console.log(currentUser);
     // Check if they have permissions to do this
     hasPermission(currentUser, ['ADMIN']);
     // Validate whether there are any empty field
@@ -355,9 +354,14 @@ const Mutations = {
       throw new Error('Please fill out all fields');
     }
     // Create the post
-    const post = await ctx.db.mutations.createPost(
+    const post = await ctx.db.mutation.createPost(
       {
         data: {
+          user: {
+            connect: {
+              id: ctx.request.userId,
+            },
+          },
           ...args,
         },
       },

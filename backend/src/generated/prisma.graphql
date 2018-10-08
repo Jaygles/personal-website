@@ -1,5 +1,5 @@
 # source: https://us1.prisma.sh/jay-sullivan-2d71a8/personal-backend/dev
-# timestamp: Sun Oct 07 2018 18:26:14 GMT-0600 (Mountain Daylight Time)
+# timestamp: Sun Oct 07 2018 22:11:57 GMT-0600 (Mountain Daylight Time)
 
 type AggregateCartItem {
   count: Int!
@@ -262,7 +262,7 @@ type CommentConnection {
 input CommentCreateInput {
   title: String
   content: String
-  user: UserCreateOneInput!
+  user: UserCreateOneWithoutCommentsInput!
   post: PostCreateOneWithoutCommentInput!
 }
 
@@ -271,10 +271,21 @@ input CommentCreateManyWithoutPostInput {
   connect: [CommentWhereUniqueInput!]
 }
 
+input CommentCreateManyWithoutUserInput {
+  create: [CommentCreateWithoutUserInput!]
+  connect: [CommentWhereUniqueInput!]
+}
+
 input CommentCreateWithoutPostInput {
   title: String
   content: String
-  user: UserCreateOneInput!
+  user: UserCreateOneWithoutCommentsInput!
+}
+
+input CommentCreateWithoutUserInput {
+  title: String
+  content: String
+  post: PostCreateOneWithoutCommentInput!
 }
 
 """An edge in a connection."""
@@ -347,7 +358,7 @@ input CommentSubscriptionWhereInput {
 input CommentUpdateInput {
   title: String
   content: String
-  user: UserUpdateOneRequiredInput
+  user: UserUpdateOneRequiredWithoutCommentsInput
   post: PostUpdateOneRequiredWithoutCommentInput
 }
 
@@ -360,10 +371,25 @@ input CommentUpdateManyWithoutPostInput {
   upsert: [CommentUpsertWithWhereUniqueWithoutPostInput!]
 }
 
+input CommentUpdateManyWithoutUserInput {
+  create: [CommentCreateWithoutUserInput!]
+  connect: [CommentWhereUniqueInput!]
+  disconnect: [CommentWhereUniqueInput!]
+  delete: [CommentWhereUniqueInput!]
+  update: [CommentUpdateWithWhereUniqueWithoutUserInput!]
+  upsert: [CommentUpsertWithWhereUniqueWithoutUserInput!]
+}
+
 input CommentUpdateWithoutPostDataInput {
   title: String
   content: String
-  user: UserUpdateOneRequiredInput
+  user: UserUpdateOneRequiredWithoutCommentsInput
+}
+
+input CommentUpdateWithoutUserDataInput {
+  title: String
+  content: String
+  post: PostUpdateOneRequiredWithoutCommentInput
 }
 
 input CommentUpdateWithWhereUniqueWithoutPostInput {
@@ -371,10 +397,21 @@ input CommentUpdateWithWhereUniqueWithoutPostInput {
   data: CommentUpdateWithoutPostDataInput!
 }
 
+input CommentUpdateWithWhereUniqueWithoutUserInput {
+  where: CommentWhereUniqueInput!
+  data: CommentUpdateWithoutUserDataInput!
+}
+
 input CommentUpsertWithWhereUniqueWithoutPostInput {
   where: CommentWhereUniqueInput!
   update: CommentUpdateWithoutPostDataInput!
   create: CommentCreateWithoutPostInput!
+}
+
+input CommentUpsertWithWhereUniqueWithoutUserInput {
+  where: CommentWhereUniqueInput!
+  update: CommentUpdateWithoutUserDataInput!
+  create: CommentCreateWithoutUserInput!
 }
 
 input CommentWhereInput {
@@ -1664,6 +1701,12 @@ enum Permission {
   ITEMUPDATE
   ITEMDELETE
   PERMISSIONUPDATE
+  POSTCREATE
+  POSTUPDATE
+  POSTDELETE
+  COMMENTCREATE
+  COMMENTUPDATE
+  COMMENTDELETE
 }
 
 type Post implements Node {
@@ -1687,8 +1730,13 @@ type PostConnection {
 input PostCreateInput {
   title: String!
   content: String!
-  user: UserCreateOneInput!
+  user: UserCreateOneWithoutPostsInput!
   comment: CommentCreateManyWithoutPostInput
+}
+
+input PostCreateManyWithoutUserInput {
+  create: [PostCreateWithoutUserInput!]
+  connect: [PostWhereUniqueInput!]
 }
 
 input PostCreateOneWithoutCommentInput {
@@ -1699,7 +1747,13 @@ input PostCreateOneWithoutCommentInput {
 input PostCreateWithoutCommentInput {
   title: String!
   content: String!
-  user: UserCreateOneInput!
+  user: UserCreateOneWithoutPostsInput!
+}
+
+input PostCreateWithoutUserInput {
+  title: String!
+  content: String!
+  comment: CommentCreateManyWithoutPostInput
 }
 
 """An edge in a connection."""
@@ -1772,8 +1826,17 @@ input PostSubscriptionWhereInput {
 input PostUpdateInput {
   title: String
   content: String
-  user: UserUpdateOneRequiredInput
+  user: UserUpdateOneRequiredWithoutPostsInput
   comment: CommentUpdateManyWithoutPostInput
+}
+
+input PostUpdateManyWithoutUserInput {
+  create: [PostCreateWithoutUserInput!]
+  connect: [PostWhereUniqueInput!]
+  disconnect: [PostWhereUniqueInput!]
+  delete: [PostWhereUniqueInput!]
+  update: [PostUpdateWithWhereUniqueWithoutUserInput!]
+  upsert: [PostUpsertWithWhereUniqueWithoutUserInput!]
 }
 
 input PostUpdateOneRequiredWithoutCommentInput {
@@ -1786,12 +1849,29 @@ input PostUpdateOneRequiredWithoutCommentInput {
 input PostUpdateWithoutCommentDataInput {
   title: String
   content: String
-  user: UserUpdateOneRequiredInput
+  user: UserUpdateOneRequiredWithoutPostsInput
+}
+
+input PostUpdateWithoutUserDataInput {
+  title: String
+  content: String
+  comment: CommentUpdateManyWithoutPostInput
+}
+
+input PostUpdateWithWhereUniqueWithoutUserInput {
+  where: PostWhereUniqueInput!
+  data: PostUpdateWithoutUserDataInput!
 }
 
 input PostUpsertWithoutCommentInput {
   update: PostUpdateWithoutCommentDataInput!
   create: PostCreateWithoutCommentInput!
+}
+
+input PostUpsertWithWhereUniqueWithoutUserInput {
+  where: PostWhereUniqueInput!
+  update: PostUpdateWithoutUserDataInput!
+  create: PostCreateWithoutUserInput!
 }
 
 input PostWhereInput {
@@ -1982,6 +2062,8 @@ type User implements Node {
   resetTokenExpiry: Float
   permissions: [Permission!]!
   cart(where: CartItemWhereInput, orderBy: CartItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CartItem!]
+  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
+  comments(where: CommentWhereInput, orderBy: CommentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Comment!]
 }
 
 """A connection to a list of items."""
@@ -2002,6 +2084,8 @@ input UserCreateInput {
   resetTokenExpiry: Float
   permissions: UserCreatepermissionsInput
   cart: CartItemCreateManyWithoutUserInput
+  posts: PostCreateManyWithoutUserInput
+  comments: CommentCreateManyWithoutUserInput
 }
 
 input UserCreateOneInput {
@@ -2011,6 +2095,16 @@ input UserCreateOneInput {
 
 input UserCreateOneWithoutCartInput {
   create: UserCreateWithoutCartInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateOneWithoutCommentsInput {
+  create: UserCreateWithoutCommentsInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateOneWithoutPostsInput {
+  create: UserCreateWithoutPostsInput
   connect: UserWhereUniqueInput
 }
 
@@ -2025,6 +2119,30 @@ input UserCreateWithoutCartInput {
   resetToken: String
   resetTokenExpiry: Float
   permissions: UserCreatepermissionsInput
+  posts: PostCreateManyWithoutUserInput
+  comments: CommentCreateManyWithoutUserInput
+}
+
+input UserCreateWithoutCommentsInput {
+  name: String!
+  email: String!
+  password: String!
+  resetToken: String
+  resetTokenExpiry: Float
+  permissions: UserCreatepermissionsInput
+  cart: CartItemCreateManyWithoutUserInput
+  posts: PostCreateManyWithoutUserInput
+}
+
+input UserCreateWithoutPostsInput {
+  name: String!
+  email: String!
+  password: String!
+  resetToken: String
+  resetTokenExpiry: Float
+  permissions: UserCreatepermissionsInput
+  cart: CartItemCreateManyWithoutUserInput
+  comments: CommentCreateManyWithoutUserInput
 }
 
 """An edge in a connection."""
@@ -2112,6 +2230,8 @@ input UserUpdateDataInput {
   resetTokenExpiry: Float
   permissions: UserUpdatepermissionsInput
   cart: CartItemUpdateManyWithoutUserInput
+  posts: PostUpdateManyWithoutUserInput
+  comments: CommentUpdateManyWithoutUserInput
 }
 
 input UserUpdateInput {
@@ -2122,6 +2242,8 @@ input UserUpdateInput {
   resetTokenExpiry: Float
   permissions: UserUpdatepermissionsInput
   cart: CartItemUpdateManyWithoutUserInput
+  posts: PostUpdateManyWithoutUserInput
+  comments: CommentUpdateManyWithoutUserInput
 }
 
 input UserUpdateOneInput {
@@ -2147,6 +2269,20 @@ input UserUpdateOneRequiredWithoutCartInput {
   upsert: UserUpsertWithoutCartInput
 }
 
+input UserUpdateOneRequiredWithoutCommentsInput {
+  create: UserCreateWithoutCommentsInput
+  connect: UserWhereUniqueInput
+  update: UserUpdateWithoutCommentsDataInput
+  upsert: UserUpsertWithoutCommentsInput
+}
+
+input UserUpdateOneRequiredWithoutPostsInput {
+  create: UserCreateWithoutPostsInput
+  connect: UserWhereUniqueInput
+  update: UserUpdateWithoutPostsDataInput
+  upsert: UserUpsertWithoutPostsInput
+}
+
 input UserUpdatepermissionsInput {
   set: [Permission!]
 }
@@ -2158,6 +2294,30 @@ input UserUpdateWithoutCartDataInput {
   resetToken: String
   resetTokenExpiry: Float
   permissions: UserUpdatepermissionsInput
+  posts: PostUpdateManyWithoutUserInput
+  comments: CommentUpdateManyWithoutUserInput
+}
+
+input UserUpdateWithoutCommentsDataInput {
+  name: String
+  email: String
+  password: String
+  resetToken: String
+  resetTokenExpiry: Float
+  permissions: UserUpdatepermissionsInput
+  cart: CartItemUpdateManyWithoutUserInput
+  posts: PostUpdateManyWithoutUserInput
+}
+
+input UserUpdateWithoutPostsDataInput {
+  name: String
+  email: String
+  password: String
+  resetToken: String
+  resetTokenExpiry: Float
+  permissions: UserUpdatepermissionsInput
+  cart: CartItemUpdateManyWithoutUserInput
+  comments: CommentUpdateManyWithoutUserInput
 }
 
 input UserUpsertNestedInput {
@@ -2168,6 +2328,16 @@ input UserUpsertNestedInput {
 input UserUpsertWithoutCartInput {
   update: UserUpdateWithoutCartDataInput!
   create: UserCreateWithoutCartInput!
+}
+
+input UserUpsertWithoutCommentsInput {
+  update: UserUpdateWithoutCommentsDataInput!
+  create: UserCreateWithoutCommentsInput!
+}
+
+input UserUpsertWithoutPostsInput {
+  update: UserUpdateWithoutPostsDataInput!
+  create: UserCreateWithoutPostsInput!
 }
 
 input UserWhereInput {
@@ -2404,6 +2574,12 @@ input UserWhereInput {
   cart_every: CartItemWhereInput
   cart_some: CartItemWhereInput
   cart_none: CartItemWhereInput
+  posts_every: PostWhereInput
+  posts_some: PostWhereInput
+  posts_none: PostWhereInput
+  comments_every: CommentWhereInput
+  comments_some: CommentWhereInput
+  comments_none: CommentWhereInput
 }
 
 input UserWhereUniqueInput {

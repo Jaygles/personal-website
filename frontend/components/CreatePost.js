@@ -1,7 +1,18 @@
 import React, { Component } from 'react';
 import { Editor, EditorState, RichUtils, getDefaultKeyBinding, convertToRaw } from 'draft-js';
+import { Mutation } from 'react-apollo';
+import gql from 'graphql-tag';
 import draftToHtml from '../lib/draftjs-to-html';
 import StyleButton from './StyleButton';
+import Error from './ErrorMessage';
+
+const CREATE_POST_MUTATION = gql`
+  mutation CREATE_POST_MUTATION($title: String!, $content: String!) {
+    createPost(title: $title, content: $content) {
+      id
+    }
+  }
+`;
 
 const BLOCK_TYPES = [
   { label: 'H1', style: 'header-one' },
@@ -133,71 +144,78 @@ class CreatePost extends Component {
 
   render() {
     return (
-      <div className="columns">
-        <div className="column is-8 is-offset-2">
-          <div className="RichEditor-root content">
-            <fieldset>
-              <div className="field">
-                <label htmlFor="title" className="label content">
-                  Title
-                </label>
-                <div className="control">
-                  <input
-                    value={this.state.title}
-                    onChange={e => this.handleTitleChange(e)}
-                    id="title "
-                    type="text"
-                    className="input"
-                  />
-                </div>
-              </div>
-              <div className="field">
-                <label htmlFor="content" className="label">
-                  Content
-                </label>
+      <Mutation
+        mutation={CREATE_POST_MUTATION}
+        variables={{ title: this.state.title, content: this.state.content }}
+      >
+        {(createPost, { loading, error }) => (
+          <div className="columns">
+            <div className="column is-8 is-offset-2">
+              <Error error={error} />
+              <div className="RichEditor-root content">
+                <fieldset>
+                  <div className="field">
+                    <label htmlFor="title" className="label content">
+                      Title
+                    </label>
+                    <div className="control">
+                      <input
+                        value={this.state.title}
+                        onChange={e => this.handleTitleChange(e)}
+                        id="title "
+                        type="text"
+                        className="input"
+                      />
+                    </div>
+                  </div>
+                  <div className="field">
+                    <label htmlFor="content" className="label">
+                      Content
+                    </label>
 
-                <div className="control">
-                  <BlockStyleControls
-                    editorState={this.state.editorState}
-                    onToggle={this.toggleBlockType}
-                  />
-                  <InlineStyleControls
-                    editorState={this.state.editorState}
-                    onToggle={this.toggleInlineStyle}
-                  />
-                  <Editor
-                    blockStyleFn={getBlockStyle}
-                    customStyleMap={styleMap}
-                    editorState={this.state.editorState}
-                    onChange={this.handleChange}
-                    placeholder="Tell a story..."
-                    ref="editor"
-                    spellCheck
-                    handleKeyCommand={this.handleKeyCommand}
-                    keyBindingFn={this.mapKeyToEditorCommand}
-                  />
-                </div>
+                    <div className="control">
+                      <BlockStyleControls
+                        editorState={this.state.editorState}
+                        onToggle={this.toggleBlockType}
+                      />
+                      <InlineStyleControls
+                        editorState={this.state.editorState}
+                        onToggle={this.toggleInlineStyle}
+                      />
+                      <Editor
+                        blockStyleFn={getBlockStyle}
+                        customStyleMap={styleMap}
+                        editorState={this.state.editorState}
+                        onChange={this.handleChange}
+                        placeholder="Tell a story..."
+                        ref="editor"
+                        spellCheck
+                        handleKeyCommand={this.handleKeyCommand}
+                        keyBindingFn={this.mapKeyToEditorCommand}
+                      />
+                    </div>
+                  </div>
+                  <div className="field">
+                    <div className="control">
+                      <button
+                        className={loading ? 'button is-primary is-loading' : 'button is-primary'}
+                        id="create-post"
+                        onClick={async e => {
+                          e.preventDefault();
+                          const res = await createPost();
+                          console.log(res);
+                        }}
+                      >
+                        Post
+                      </button>
+                    </div>
+                  </div>
+                </fieldset>
               </div>
-              <div className="field">
-                <div className="control">
-                  <button
-                    className="button"
-                    id="create-post"
-                    onClick={() => {
-                      const something = this.state.editorState
-                        .getCurrentContent()
-                        .getBlocksAsArray();
-                      console.log(something);
-                    }}
-                  >
-                    Click me
-                  </button>
-                </div>
-              </div>
-            </fieldset>
+            </div>
           </div>
-        </div>
-      </div>
+        )}
+      </Mutation>
     );
   }
 }

@@ -22,6 +22,8 @@ type User {
   resetTokenExpiry: Float
   permissions: [Permission]
   cart: [CartItem!]!
+  posts: [Post!]!
+  comments: [Comment!]!
 }
 
 type Comment {
