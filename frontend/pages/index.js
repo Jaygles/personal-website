@@ -2,7 +2,7 @@ import Posts from '../components/Posts';
 
 const Home = props => (
   <div>
-    <Posts {...props} />
+    <Posts page={parseFloat(props.query.page) || 1} />
   </div>
 );
 
