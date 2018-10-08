@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Query, Mutation } from 'react-apollo';
+import { Mutation } from 'react-apollo';
 import User from './User';
 import { TOGGLE_MODAL_MUTATION } from './Modal';
 import Signout from './Signout';

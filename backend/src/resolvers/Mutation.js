@@ -136,8 +136,9 @@ const Mutations = {
       subject: 'Your Password Reset Token',
       html: makeANiceEmail(`Your Password Reset Token is here!
       \n\n
-      <a href="${process.env
-        .FRONTEND_URL}/reset?resetToken=${resetToken}">Click Here to Reset</a>`),
+      <a href="${
+        process.env.FRONTEND_URL
+      }/reset?resetToken=${resetToken}">Click Here to Reset</a>`),
     });
 
     // 4. Return the message
@@ -277,7 +278,8 @@ const Mutations = {
   async createOrder(parent, args, ctx, info) {
     // 1. Query the current user and make sure they are signed in
     const { userId } = ctx.request;
-    if (!userId) throw new Error('You must be signed in to complete this order.');
+    if (!userId)
+      throw new Error('You must be signed in to complete this order.');
     const user = await ctx.db.query.user(
       { where: { id: userId } },
       `{
@@ -331,6 +333,38 @@ const Mutations = {
     });
     // 7. Return the Order to the client
     return order;
+  },
+  async createPost(parent, args, ctx, info) {
+    // Query the user and make sure they are signed in
+    const { userId } = ctx.request;
+    if (!userId)
+      throw new Error('You must be signed in to complete this order.');
+    // Query the current user
+    const currentUser = await ctx.db.query.user(
+      {
+        where: {
+          id: ctx.request.userId,
+        },
+      },
+      info
+    );
+    // Check if they have permissions to do this
+    hasPermission(currentUser, ['ADMIN']);
+    // Validate whether there are any empty field
+    if (args.title === '' || args.content === '') {
+      throw new Error('Please fill out all fields');
+    }
+    // Create the post
+    const post = await ctx.db.mutations.createPost(
+      {
+        data: {
+          ...args,
+        },
+      },
+      info
+    );
+    // Return the post to the client
+    return post;
   },
 };
 

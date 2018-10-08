@@ -5,6 +5,12 @@ enum Permission {
   ITEMUPDATE
   ITEMDELETE
   PERMISSIONUPDATE
+  POSTCREATE
+  POSTUPDATE
+  POSTDELETE
+  COMMENTCREATE
+  COMMENTUPDATE
+  COMMENTDELETE
 }
 
 type User {
@@ -16,6 +22,22 @@ type User {
   resetTokenExpiry: Float
   permissions: [Permission]
   cart: [CartItem!]!
+}
+
+type Comment {
+  id: ID! @unique
+  title: String
+  content: String
+  user: User!
+  post: Post!
+}
+
+type Post {
+  id: ID! @unique
+  title: String!
+  content: String!
+  user: User!
+  comment: [Comment!]!
 }
 
 type Item {
