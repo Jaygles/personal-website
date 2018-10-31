@@ -32,6 +32,8 @@ type Comment {
   content: String
   user: User!
   post: Post!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Post {
@@ -40,6 +42,8 @@ type Post {
   content: String!
   user: User!
   comment: [Comment!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Item {
@@ -50,6 +54,8 @@ type Item {
   largeImage: String
   price: Int!
   user: User!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type CartItem {

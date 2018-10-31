@@ -1,10 +1,20 @@
 import React, { Component } from 'react';
-import { Editor, EditorState, RichUtils, getDefaultKeyBinding, convertToRaw } from 'draft-js';
+import Editor from 'draft-js-plugins-editor';
+import createInlineToolbarPlugin from 'draft-js-inline-toolbar-plugin';
+import createLinkPlugin from 'draft-js-anchor-plugin';
+import { EditorState, RichUtils, getDefaultKeyBinding, convertToRaw } from 'draft-js';
+import { ItalicButton, BoldButton, UnderlineButton } from 'draft-js-buttons';
 import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
 import draftToHtml from '../lib/draftjs-to-html';
 import StyleButton from './StyleButton';
 import Error from './ErrorMessage';
+
+const linkPlugin = createLinkPlugin();
+const inlineToolbarPlugin = createInlineToolbarPlugin({
+  structure: [BoldButton, ItalicButton, UnderlineButton, linkPlugin.LinkButton],
+});
+const { InlineToolbar } = inlineToolbarPlugin;
 
 const CREATE_POST_MUTATION = gql`
   mutation CREATE_POST_MUTATION($title: String!, $content: String!) {
@@ -189,10 +199,12 @@ class CreatePost extends Component {
                         onChange={this.handleChange}
                         placeholder="Tell a story..."
                         ref="editor"
+                        plugins={[inlineToolbarPlugin, linkPlugin]}
                         spellCheck
                         handleKeyCommand={this.handleKeyCommand}
                         keyBindingFn={this.mapKeyToEditorCommand}
                       />
+                      <InlineToolbar />
                     </div>
                   </div>
                   <div className="field">

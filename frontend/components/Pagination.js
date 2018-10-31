@@ -24,15 +24,10 @@ const PaginationStyles = styled.div`
   justify-content: center;
   align-content: center;
   margin: 2rem 0;
-  border: 1px solid ${props => props.theme.lightgrey};
   border-radius: 10px;
   & > * {
     margin: 0;
     padding: 15px 30px;
-    border-right: 1px solid ${props => props.theme.lightgrey};
-    &:last-child {
-      border-right: 0;
-    }
   }
   a[aria-disabled='true'] {
     color: grey;
@@ -51,13 +46,13 @@ const Pagination = props => (
         <PaginationStyles data-test="pagination">
           <Head>
             <title>
-              Jay Sully — Page {page} of {pages}
+              Jay Sully — Post {page} of {pages}
             </title>
           </Head>
           <Link
             prefetch
             href={{
-              pathname: 'pages',
+              pathname: 'posts',
               query: { page: page - 1 },
             }}
           >
@@ -66,14 +61,12 @@ const Pagination = props => (
             </a>
           </Link>
           <p>
-            Page {props.page} of
-            <span className="totalPages">{pages}</span>!
+            Post {props.page} of <span className="totalPages">{pages}</span>
           </p>
-          <p>{count} Posts Total</p>
           <Link
             prefetch
             href={{
-              pathname: 'pages',
+              pathname: 'posts',
               query: { page: page + 1 },
             }}
           >

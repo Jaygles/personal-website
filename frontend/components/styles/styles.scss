@@ -3,5 +3,23 @@
 
 // 2. Override styles
 
+$family-sans-serif: 'Bai Jamjuree', 'Niramit', 'M PLUS Rounded 1c',
+  'IBM Plex Sans', sans-serif;
+$primary: #e98a15;
+
+html {
+  background-image: url('~/static/folk.png');
+  background-attachment: fixed;
+}
+
+body {
+  padding-bottom: 3.6rem !important;
+  background-color: rgba(162, 162, 162, 0.8);
+}
+
+main {
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.19);
+  background-color: #fdfdfd;
+}
 // 3. Import the rest of Bulma;
 @import '~bulma/bulma';
